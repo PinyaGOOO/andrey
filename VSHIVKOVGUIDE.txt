@@ -1,0 +1,150 @@
+hostnamectl set-hostname isp
+exec bash
+useradd -c "Admin" admin -U
+passwd admin
+nano /etc/sysсtl.conf
+net.ipv4.ip_forward=1
+dnf install -y iperf3 nftables
+nano /etc/nftables/isp.nft
+table inet my_nat {
+	chain my_masquerade {
+	type nat hook postrouting priority scrnat;
+	oifname "ens18" masquerade
+	}
+}
+nano /etc/sysconfig/nftables.conf
+include "/etc/nftables/isp.nft"
+systemctl restart nftables
+systemctl enable nftables
+
+hostnamectl set-hostname HQ-R
+exec bash
+useradd -U admin
+passwd admin
+nano /etc/sysctl.conf
+net.ipv4.ip_forward=1
+dnf install -y iperf3 dhcp nftables frr
+nano /etc/nftables/hq-r.nft
+table inet my_nat {
+	chain my_masquerade {
+	type nat hook postrouting priority srcnat;
+	oifnsame "ens18" masquerade
+	}
+} 
+nano /etc/sysconfig/nftables.conf
+# hq-r.nft
+systemctl restart nftables
+systemctl enable nftables
+
+hostnamectl set-hostname BR-R
+exec bash
+useradd -U admin
+passwd admin
+nano /etc/sysctl.conf
+net.ipv4.ip_forward=1
+sysctl -p
+dnf install -y nftables frr
+nano /etc/nftables/br-r.nft
+table inet my_nat {
+	chain my_masquerade {
+	type nat hook postrouting priority srcnat;
+	oifname "ens18" masquerade
+	}
+}
+nano /etc/sysconfig/nftable.conf
+# br-r.nft
+systemctl restart nftables
+systemctl enable nftables
+HQ-R&BR-R
+tun1			tun1
+tun1			tun1
+gre			gre	
+ens18			ens18
+1.1.1.2			2.2.2.2
+2.2.2.2			1.1.1.2
+10.10.10.1/30 		10.10.10.2/30
+nmcli connection modify tun1 ip-tunnel.tll 64
+nano /etc/frr/daemons
+ospfd=yes
+systemctl restart frr
+systemctl enable frr
+vtysh
+router ospf				router ospf
+passive-interface default		passive-interface default
+network 10.10.10.0/30 area 0		network 10.10.10.0/30 area 0
+network 172.16.100.0/26 area 0		network 192.168.100.0/28 area 0
+exit					exit
+interface tun1				interface tun1
+no ip ospf network br			no ip ospf network br
+no ip ospf passive 			no ip ospf passive
+do wr 					do wr
+reboot
+show ip ospf neighbor
+HQ-R
+nano /etc/dhcp/dhcpd.conf
+subnet 172.16.100.0 netmask 255.255.255.192 {
+range 172.16.100.2 172.16.100.62;
+option routers 172.16.100.1;
+default-lease-time 600;
+max-lease-time 7200;
+}
+host hq-srv {
+     hardware ethernet ff:ff:ff:ff:ff:ff;
+     fixed-address 172.16.100.2;
+     option domain-name-servers 8.8.8.8;
+}
+/etc/sysconfig/dhcp 
+DHCPDARGS=ens19 
+systemctl restart dhcpd
+systemctl enable dhcpd
+ISP&HQ-R
+iperf3 -s 	iperf3 -c 1.1.1.1
+HQ-R
+mkdir /var/{backup,backup-script}
+nano /var/backup-script/backup.sh
+
+#!/bin/bash
+
+data=$(date +%d.%m.%Y-%H:M:%S)
+mkdir /var/backup/$data
+cp -r /etc/frr /var/backup/$data
+cp -r /etc/dhcp /var/backup/$data
+cp -r /ect/nftables /var/backup/$data
+cp -r /etc/NetworkManager/system-connections /var/backup/$data
+cd /var/backup
+tar czfv "./$data.tar.gz" ./$data
+rm -r /var/backup/$data
+chmod +x /var/backup-script/backup.sh
+/var/backup-script/backup.sh
+BR-R
+mkdir /var/{backup,backup-script}
+scp admin@10.10.10.1:/var/backup-script/backup.sh /var/backup-script/
+chmod +x /var/backup-script/backup.sh
+/var/backup-script/backup.sh
+HQ-R
+systemctl restart sshd
+ss -tlpn | grep ssh
+nano /etc/nftables/hq-r.nft (dopolnyaem)
+chain prerouting {
+type nat hook prerouting priority filter; policy accept;
+ip daddr 1.1.1.2 tcp dport 22 dnat ip to 172.16.100.2:2222
+ip daddr 4.4.4.1 tcp dport 22 dnat ip to 172.16.100.2:2222
+}
+}
+systemctl restart nftable
+HQ-SRV
+nano /etc/ssh/sshd_config
+port 2222
+dnf install -y nftables
+nano /etc/nftables/hq-srv.nft
+table inet filter {
+	chain input {
+	type filter hook input priority filter; policy accept;
+	ip saddr 3.3.3.2 tcp dport 2222 counter reject
+	ip saddr 4.4.4.0/30 tcp dport 2222 counter reject
+	}
+}
+nano /etc/sysconfig/nftables.conf
+# hq-srv.nft
+systemctl restart nftable
+systemctl enable --now nftable
