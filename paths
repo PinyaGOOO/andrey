@@ -1,0 +1,95 @@
+Привет аднрюха надеюсь ты сдашь и все будет у тебя без ошибочек)))
+Как закончишь не забудь удалить директорию с гайдом на испе)
+(и историю)
+
+НАСТРОЙКА
+
+настройка hq-r
+1. прописываем nmtui > ens18 > (Автоматически > Вручную) > ставим адрес 1.1.1.2 > gateway 1.1.1.1 > dns 8.8.8.8 > ok
+2. systemctl restart NetworkManager
+3. dnf install -y git
+4. git clone https://github.com/PinyaGOOO/andrey
+5. cd andrey
+6. bash hq-r.sh
+7. history -c 
+8. cd > rm -rf andrey
+9. reboot
+(при ошибках dhcp обращайся ко мне)
+
+настройка br-r
+1. прописываем nmtui > ens18 > (Автоматически > Вручную) > ставим адрес 2.2.2.2 > gateway 2.2.2.1 > dns 8.8.8.8 > ok
+2. systemctl restart NetworkManager
+3. dnf install -y git
+4. git clone https://github.com/PinyaGOOO/andrey
+5. cd andrey
+6. bash br-r.sh
+7. history -c 
+8. cd > rm -rf andrey
+
+настройка cli
+1. прописываем nmtui > ens18 > (Автоматически > Вручную) > ставим адрес 3.3.3.2 > gateway 3.3.3.1 > dns 8.8.8.8 > ok
+2. systemctl restart NetworkManager
+3. dnf install -y git
+4. git clone https://github.com/PinyaGOOO/andrey
+5. cd andrey
+6. bash cli.sh
+7. history -c 
+8. cd > rm -rf andrey
+
+настройка hq-srv
+1. systemctl restart NetworkManager
+2. dnf install -y git
+3. git clone https://github.com/PinyaGOOO/andrey
+4. cd andrey
+5. bash hq-srv.sh
+6. history -c 
+7. cd > rm -rf andrey
+
+настройка br-srv
+1. прописываем nmtui > ens18 > (Автоматически > Вручную) > ставим адрес 192.168.100.10 > gateway 192.168.100.1 > dns 8.8.8.8 > ok
+2. systemctl restart NetworkManager
+3. dnf install -y git
+4. git clone https://github.com/PinyaGOOO/andrey
+5. cd andrey
+6. bash br-srv.sh
+7. history -c 
+8. cd > rm -rf andrey
+
+ОТЧЕТ
+
+1. Создай таблицу в ней
+Задание 1 модуля 1
+ISP    |    1.1.1.1/30 2.2.2.1/30 3.3.3.1/30
+hq-r   |    1.1.1.2/30 172.16.100.1/28 4.4.4.1/30 10.10.10.1/30
+br-r   |    2.2.2.2/30 192.168.100.1/29 10.10.10.2/30
+hq-srv |    172.16.100.2/28
+br-srv |    192.168.100.10/29
+cli    |    3.3.3.2/30 4.4.4.2/30
+
+2. L3 топология если сможешь
+Задание2 модуля 1
+
+"L3 схема"
+
+3. iperf пропускная способность
+задание 5 модуля 1
+
+(заходим на isp прописываем iperf3 -s)
+(заходим на hq-r прописываем iperf3 -c 1.1.1.1)
+(ждем пока полностью пройдет делаем скрин на hq-r и вставляем в фаил)
+
+4 backup (hq-r)
+задание 6 модуля 1
+
+/var/backup-script/backup.sh
+
+(делаем скрин вывода и вставляем)
+
+
+
+
+
+
+
+
+
