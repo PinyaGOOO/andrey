@@ -1,0 +1,3 @@
+sudo nmcli connection modify enp0s3 ipv4.dns "127.0.0.1"
+sudo nmcli connection modify enp0s3 ipv4.ignore-auto-dns yes
+sudo nmcli connection up enp0s3
